@@ -27,7 +27,7 @@ but when you're ready to test your own agent, replace it with MyAgent
 """
 
 
-def createAgents(num_pacmen, agent='UnclaimedDotAgent'):
+def createAgents(num_pacmen, agent='ClosestDotAgent'):
     return [eval(agent)(index=i) for i in range(num_pacmen)]
 
 
