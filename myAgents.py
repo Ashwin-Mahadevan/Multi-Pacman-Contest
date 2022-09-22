@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 from collections import defaultdict
+import random
 from game import Actions, Agent, Directions
 from search import bfs
 from searchProblems import PositionSearchProblem
@@ -19,7 +20,6 @@ from searchProblems import PositionSearchProblem
 import util
 import time
 import search
-
 """
 IMPORTANT
 `agent` defines which agent you will use. By default, it is set to ClosestDotAgent,
@@ -31,28 +31,23 @@ def createAgents(num_pacmen, agent='ClosestDotAgent'):
     return [eval(agent)(index=i) for i in range(num_pacmen)]
 
 
-class MyAgent(Agent):
+class CheeseBruteForceAgent(Agent):
     """
     Implementation of your agent.
     """
+
+    layout = None
 
     def getAction(self, state):
         """
         Returns the next action the agent will take
         """
-        "*** YOUR CODE HERE ***"
 
-        raise NotImplementedError()
+        if not CheeseBruteForceAgent.layout:
+            r = random.Random(str(state.data.layout))
+            CheeseBruteForceAgent.layout = r.randrange(1_000_000)
+            print(CheeseBruteForceAgent.layout)
 
-    def initialize(self):
-        """
-        Intialize anything you want to here. This function is called
-        when the agent is first created. If you don't need to use it, then
-        leave it blank
-        """
-        "*** YOUR CODE HERE"
-
-        raise NotImplementedError()
 
 """
 Put any other SearchProblems or search methods below. You may also import classes/methods in
@@ -82,6 +77,8 @@ class ClosestDotAgent(Agent):
     def initialize(self):
 
         self.path = None
+
+
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
     A search problem for finding a path to any food.
