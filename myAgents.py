@@ -138,6 +138,15 @@ search.py and searchProblems.py. (ClosestDotAgent as an example below)
 
 class ClosestDotAgent(Agent):
 
+    def findPathToClosestDot(self, gameState):
+        """
+        Returns a path (a list of actions) to the closest dot, starting from
+        gameState.
+        """
+
+        problem = AnyFoodSearchProblem(gameState, self.index)
+        return search.bfs(problem)
+
     def getAction(self, state):
 
         if not self.path:
@@ -149,8 +158,6 @@ class ClosestDotAgent(Agent):
     def initialize(self):
 
         self.path = None
-
-
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
     A search problem for finding a path to any food.
