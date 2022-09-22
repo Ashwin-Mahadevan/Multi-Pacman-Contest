@@ -11,6 +11,7 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+from collections import defaultdict
 from game import Agent
 from searchProblems import PositionSearchProblem
 
@@ -60,17 +61,17 @@ search.py and searchProblems.py. (ClosestDotAgent as an example below)
 
 class ClosestDotAgent(Agent):
 
-    def findPathToClosestDot(self, gameState):
-        """
-        Returns a path (a list of actions) to the closest dot, starting from
-        gameState.
-        """
-
-        problem = AnyFoodSearchProblem(gameState, self.index)
-        return search.bfs(problem)
-
     def getAction(self, state):
-        return self.findPathToClosestDot(state)[0]
+
+        if not self.path:
+            problem = AnyFoodSearchProblem(state, self.index)
+            self.path = search.bfs(problem)
+
+        return self.path.pop(0)
+
+    def initialize(self):
+
+        self.path = None
 
 
 class AnyFoodSearchProblem(PositionSearchProblem):
