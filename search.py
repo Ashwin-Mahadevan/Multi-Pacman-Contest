@@ -10,14 +10,13 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
-
 """
 In search.py, you will implement generic search algorithms which are called by
 Pacman agents (in searchAgents.py).
 """
 
 import util
+
 
 class SearchProblem:
     """
@@ -70,7 +69,8 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem):
     """
@@ -87,29 +87,98 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    fringe = util.Stack()
+    fringe.push((problem.getStartState(), list()))
+
+    visited = set()
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+
+        if state in visited: continue
+        visited.add(state)
+
+        if problem.isGoalState(state):
+            return actions
+
+        for (successor, action, cost) in problem.getSuccessors(state):
+            fringe.push((successor, actions + [action]))
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    fringe = util.Queue()
+    fringe.push((problem.getStartState(), list()))
+
+    visited = set()
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+
+        if state in visited: continue
+        visited.add(state)
+
+        if problem.isGoalState(state):
+            return actions
+
+        for (successor, action, cost) in problem.getSuccessors(state):
+            fringe.push((successor, actions + [action]))
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    fringe = util.PriorityQueue()
+    fringe.push((problem.getStartState(), list()), 0)
+
+    visited = set()
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+
+        if state in visited: continue
+        visited.add(state)
+
+        if problem.isGoalState(state):
+            return actions
+
+        for (successor, action, cost) in problem.getSuccessors(state):
+            fringe.update((successor, actions + [action]),
+                          problem.getCostOfActions(actions) + cost)
+
 
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the nearest
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
+
     return 0
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    fringe = util.PriorityQueue()
+    fringe.push((problem.getStartState(), list()), 0)
+
+    visited = set()
+
+    while not fringe.isEmpty():
+        state, actions = fringe.pop()
+
+        if state in visited: continue
+        visited.add(state)
+
+        if problem.isGoalState(state):
+            return actions
+
+        for (successor, action, cost) in problem.getSuccessors(state):
+            fringe.update((successor, actions + [action]),
+                          problem.getCostOfActions(actions) + cost +
+                          heuristic(successor, problem))
 
 
 # Abbreviations
