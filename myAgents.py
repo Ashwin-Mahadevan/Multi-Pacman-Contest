@@ -12,12 +12,10 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 from collections import defaultdict
-from game import Agent
+from game import Actions, Agent, Directions
+from search import bfs
 from searchProblems import PositionSearchProblem
-
-import util
-import time
-import search
+from util import Queue
 """
 IMPORTANT
 `agent` defines which agent you will use. By default, it is set to ClosestDotAgent,
@@ -25,7 +23,7 @@ but when you're ready to test your own agent, replace it with MyAgent
 """
 
 
-def createAgents(num_pacmen, agent='ClosestDotAgent'):
+def createAgents(num_pacmen, agent='UnclaimedDotAgent'):
     return [eval(agent)(index=i) for i in range(num_pacmen)]
 
 
@@ -53,6 +51,85 @@ class MyAgent(Agent):
         raise NotImplementedError()
 
 
+class UnclaimedDotAgent(Agent):
+    """
+    Similar to ClosestDotAgent, but agents claim the dots they are chasing so that other agents don't go for the same ones.
+    """
+
+    claims = defaultdict(lambda: False)
+
+    def getAction(self, state):
+        """
+        Returns the next action the agent will take
+        """
+
+        if not self.path:
+
+            startingPos = state.getPacmanPosition(self.index)
+            food = state.getFood()
+            walls = state.getWalls()
+
+            UnclaimedDotAgent.claims[startingPos] = False
+
+            fringe = Queue()
+            fringe.push((startingPos, list()))
+
+            visited = set()
+
+            while not fringe.isEmpty():
+
+                pos, actions = fringe.pop()
+
+                if pos in visited: continue
+                visited.add(pos)
+
+                x, y = pos
+
+                if food[x][y] and not UnclaimedDotAgent.claims[pos]:
+                    self.path = actions
+                    UnclaimedDotAgent.claims[pos] = True
+                    break
+            
+                for newPos, action in getSuccessors(pos, walls):
+                    fringe.push((newPos, actions + [action]))
+            
+            return Directions.STOP
+
+
+        return self.path.pop(0)
+
+    def initialize(self):
+        """
+        Intialize anything you want to here. This function is called
+        when the agent is first created. If you don't need to use it, then
+        leave it blank
+        """
+
+        self.path = list()
+
+
+def getSuccessors(pos, walls):
+
+    x, y = pos
+
+    successors = list()
+
+    for action in [
+            Directions.NORTH, Directions.SOUTH, Directions.EAST,
+            Directions.WEST
+    ]:
+        dx, dy = Actions.directionToVector(action)
+
+        next_x, next_y = int(x + dx), int(y + dy)
+
+        if walls[next_x][next_y]: continue
+
+        newPos = (next_x, next_y)
+        successors.append((newPos, action))
+    
+    return successors
+
+
 """
 Put any other SearchProblems or search methods below. You may also import classes/methods in
 search.py and searchProblems.py. (ClosestDotAgent as an example below)
@@ -65,7 +142,7 @@ class ClosestDotAgent(Agent):
 
         if not self.path:
             problem = AnyFoodSearchProblem(state, self.index)
-            self.path = search.bfs(problem)
+            self.path = bfs(problem)
 
         return self.path.pop(0)
 
