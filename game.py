@@ -716,6 +716,9 @@ class Game:
                         continue
                 except:
                     print('Your agent crashed!')
+
+                    print(traceback.format_exc())  # TODO: Remove error reporting.
+
                     self.state.data.score = 0
                     self.state.data._lose = True
                     self.rules.process(self.state, self)
